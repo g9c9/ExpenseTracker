@@ -5,7 +5,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet"
-import env from "./env";
+import env from "./validations/env.validation";
 import morgan from "morgan";
 
 const app = express();
@@ -19,7 +19,7 @@ app.use(
     })
 );
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({extended: true}));
 
 // Routes
 app.get("/", (req: Request, res: Response) => {
