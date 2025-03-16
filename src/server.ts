@@ -8,10 +8,6 @@ import helmet from "helmet"
 import env from "./env";
 import morgan from "morgan";
 
-// Env
-const PORT = env.PORT || 3000;
-const APP_ORIGIN = env.APP_ORIGIN || `http://localhost:${PORT}`
-
 const app = express();
 
 // Middlewares
@@ -19,7 +15,7 @@ app.use(morgan("dev"));
 app.use(helmet());
 app.use(
     cors({
-        origin: APP_ORIGIN
+        origin: env.APP_ORIGIN
     })
 );
 app.use(express.json());
@@ -30,4 +26,4 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Hello World!");
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(env.PORT, () => console.log(`Server running on port ${env.PORT}`));
