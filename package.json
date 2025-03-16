@@ -1,0 +1,36 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "ts-patch": "^3.3.0",
+    "typescript-transform-paths": "^3.5.5",
+    "zod": "^3.24.2"
+  },
+  "name": "expensetracker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.13.10",
+    "eslint": "^9.22.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node ./dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only -r dotenv/config ./src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
