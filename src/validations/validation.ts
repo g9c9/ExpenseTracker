@@ -7,9 +7,10 @@ export const validateRequest = (schema: z.ZodSchema) => {
         if (!parsedRequest.success) {
             let parsedErrors: string[] = [];
             Object.entries(parsedRequest.error.format()).forEach(([key, value]) => {
-                const errorObj = value as {_errors?: string[]};
-                if (errorObj._errors)
-                    parsedErrors.push(`${key}: ${errorObj._errors.join(", ")}`);
+                // const errorObj = value as {_errors?: string[]};
+                // if (errorObj._errors)
+                //     parsedErrors.push(`${key}: ${errorObj._errors.join(", ")}`);
+                parsedErrors.push(`${key}: ${value.join(", ")}`);
             });
             res.status(400).json({error: parsedErrors.join("; ")});
             return;

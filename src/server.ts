@@ -21,7 +21,7 @@ app.use(
 );
 app.use(express.json());
 // Handle json parsing failures
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     if (err instanceof SyntaxError && "body" in err) {
         res.status(400).json({error: "Invalid JSON format in body of request"});
         return;
@@ -36,5 +36,14 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/users", userAPIRoutes);
+
+// Handle internal server errors and return cleaned up response to users
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error(" ❌ Uncaught error: ", err);
+    res.status(500).json({
+        error: "Something went wrong. Please try again later.",
+        details: env.NODE_ENV === "dev" ? err.message : undefined,
+    });
+});
 
 app.listen(env.PORT, () => console.log(`Server running on port ${env.PORT}`));
