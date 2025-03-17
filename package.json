@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -18,13 +19,24 @@
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.13.10",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
+    "@typescript-eslint/parser": "^8.26.1",
     "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^16.0.0",
+    "prettier": "3.5.3",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.1"
   },
   "scripts": {
-    "build": "tsc",
+    "prettier": "npx prettier src",
+    "prettier:fix": "npx prettier src --write",
+    "lint": "npx eslint src",
+    "lint:fix": "npx eslint src --fix",
+    "build": "npm run prettier:fix && npm run lint:fix && tsc",
     "start": "npm run build && node ./dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only -r dotenv/config ./src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
