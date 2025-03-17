@@ -5,6 +5,7 @@ dotenv.config();
 
 const envSchema = z.object({
     PORT: z.coerce.number().min(3000).max(9999),
+    REGION: z.coerce.string(),
     APP_ORIGIN: z.string().url(),
     NODE_ENV: z
         .union([z.literal("dev"), z.literal("prod")])
@@ -16,6 +17,7 @@ const envSchema = z.object({
                     .min(32, "JWT_SECRET must be at least 32 characters long")
                     .regex(/[a-z]/, "JWT_SECRET must contain at least one lowercase letter")
                     .regex(/\d/, "JWT_SECRET must contain at least one number"),
+    USERS_TABLE: z.coerce.string(),
 });
 
 const env = envSchema.safeParse(process.env);
