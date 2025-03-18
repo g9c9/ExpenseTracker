@@ -1,8 +1,10 @@
-import AWS from 'aws-sdk';
+import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
 import env from '../validations/env.validation';
 import { User } from '../interfaces/user.interface';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
-const dynamoDB = new AWS.DynamoDB.DocumentClient({ region: env.REGION });
+const client = new DynamoDBClient({region: env.REGION});
+const dynamoDB = DynamoDBDocument.from(client)
 const USERS_TABLE = env.USERS_TABLE;
 
 export const addUser = async (user: User) => {
@@ -10,8 +12,7 @@ export const addUser = async (user: User) => {
     .put({
       TableName: USERS_TABLE,
       Item: user,
-    })
-    .promise();
+    });
 };
 
 export const getUser = async (id: string) => {
@@ -21,7 +22,6 @@ export const getUser = async (id: string) => {
       Key: {
         id: id,
       },
-    })
-    .promise();
+    });
   return data.Item;
 };
