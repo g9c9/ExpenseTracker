@@ -34,7 +34,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/users', userAPIRoutes);
 
 // Handle internal server errors and return cleaned up response to users
-app.use((err: Error, req: Request, res: Response) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(' ❌ Uncaught error: ', err);
   res.status(500).json({
     error: 'Something went wrong. Please try again later.',
