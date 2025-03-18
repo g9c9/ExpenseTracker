@@ -1,27 +1,49 @@
-import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
+import {
+  DynamoDBDocumentClient,
+  GetCommand,
+  PutCommand,
+  QueryCommand,
+} from '@aws-sdk/lib-dynamodb';
 import env from '../validations/env.validation';
 import { User } from '../interfaces/user.interface';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
-const client = new DynamoDBClient({region: env.REGION});
-const dynamoDB = DynamoDBDocument.from(client)
+const client = new DynamoDBClient({ region: env.REGION });
+const dynamoDB = DynamoDBDocumentClient.from(client);
 const USERS_TABLE = env.USERS_TABLE;
 
 export const addUser = async (user: User) => {
-  await dynamoDB
-    .put({
+  await dynamoDB.send(
+    new PutCommand({
       TableName: USERS_TABLE,
       Item: user,
-    });
+    }),
+  );
 };
 
-export const getUser = async (id: string) => {
-  const data = await dynamoDB
-    .get({
+export const getUser = async (id: string): Promise<User | null> => {
+  const result = await dynamoDB.send(
+    new GetCommand({
       TableName: USERS_TABLE,
       Key: {
         id: id,
       },
-    });
-  return data.Item;
+    }),
+  );
+  return (result.Item?.[0] as User) || null;
+};
+
+export const getUserEmail = async (email: string): Promise<User | null> => {
+  const result = await dynamoDB.send(
+    new QueryCommand({
+      TableName: USERS_TABLE,
+      IndexName: 'EmailIndex',
+      KeyConditionExpression: 'email = :email',
+      ExpressionAttributeValues: {
+        ':email': email,
+      },
+    }),
+  );
+
+  return (result.Items?.[0] as User) || null;
 };

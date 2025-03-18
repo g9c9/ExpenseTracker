@@ -1,6 +1,6 @@
 // Ref Web: https://medium.com/@lucchesilorenzo/set-up-a-simple-express-js-server-with-typescript-for-rest-apis-9044fee78017
-// Install dependencies: npm install express cors morgan helmet ts-patch typescript-transform-paths helmet zod dotenv aws-sdk node-forge bcryptjs uuid
-// Install dev dependencies: npm i typescript ts-node ts-node-dev @types/express @types/node @types/morgan @types/cors @eslint/js -D
+// Install dependencies: npm install express cors morgan helmet ts-patch typescript-transform-paths helmet zod dotenv aws-sdk node-forge bcryptjs uuid jsonwebtoken
+// Install dev dependencies: npm i typescript ts-node ts-node-dev @types/express @types/node @types/morgan @types/cors @eslint/js @types/jsonwebtoken -D
 // Install dev dependencies for linting and prettify: npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier @typescript-eslint/parser @typescript-eslint/eslint-plugin
 
 import https from 'https';
