@@ -1,49 +1,63 @@
 // Ref Web: https://medium.com/@lucchesilorenzo/set-up-a-simple-express-js-server-with-typescript-for-rest-apis-9044fee78017
-// Install dependencies: npm install express cors morgan helmet ts-patch typescript-transform-paths helmet zod dotenv aws-sdk
-// Install dev dependencies: npm i typescript ts-node ts-node-dev eslint @types/express @types/node @types/morgan @types/cors @eslint/js -D
+// Install dependencies: npm install express cors morgan helmet ts-patch typescript-transform-paths helmet zod dotenv aws-sdk node-forge
+// Install dev dependencies: npm i typescript ts-node ts-node-dev @types/express @types/node @types/morgan @types/cors @eslint/js -D
+// Install dev dependencies for linting and prettify: npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier @typescript-eslint/parser @typescript-eslint/eslint-plugin
 
-import express, { NextFunction, Request, Response } from "express";
-import cors from "cors";
-import helmet from "helmet"
-import env from "./validations/env.validation";
-import morgan from "morgan";
-import userAPIRoutes from "./apis/user.api";
+import https from 'https';
+import fs from 'fs';
+import forge from 'node-forge';
+import path from 'path';
+import app from './app';
+import env from './validations/env.validation';
 
-const app = express();
+// Generating Self Signed Certificates for Dev server
+const CERTS_DIR = env.CERTS_DIR;
 
-// Middlewares
-app.use(morgan("dev"));
-app.use(helmet());
-app.use(
-    cors({
-        origin: env.APP_ORIGIN
-    })
-);
-app.use(express.json());
-// Handle json parsing failures
-app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
-    if (err instanceof SyntaxError && "body" in err) {
-        res.status(400).json({error: "Invalid JSON format in body of request"});
-        return;
-    }
-    next();
+if (!fs.existsSync(CERTS_DIR)) {
+  fs.mkdirSync(CERTS_DIR, { recursive: true });
+}
+
+const certPath = path.join(CERTS_DIR, 'dev-cert.pem');
+const keyPath = path.join(CERTS_DIR, 'dev-key.pem');
+
+// Check if certificate exists and is valid for at least 30 days
+let generateCert = true;
+if (fs.existsSync(certPath)) {
+  const certData = fs.readFileSync(certPath, 'utf-8');
+  const certObj = forge.pki.certificateFromPem(certData);
+  const expiryDate = certObj.validity.notAfter;
+  const daysRemaining =
+    (expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+  generateCert = daysRemaining < 30;
+}
+
+if (generateCert) {
+  console.log('Generating new self-signed certificate...');
+  const keys = forge.pki.rsa.generateKeyPair(2048);
+  const cert = forge.pki.createCertificate();
+  cert.publicKey = keys.publicKey;
+  cert.serialNumber = '01';
+  cert.validity.notBefore = new Date();
+  cert.validity.notAfter = new Date();
+  cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1);
+
+  cert.setSubject([{ name: 'commonName', value: 'localhost' }]);
+  cert.setIssuer([{ name: 'commonName', value: 'localhost' }]);
+  cert.sign(keys.privateKey);
+
+  fs.writeFileSync(certPath, forge.pki.certificateToPem(cert));
+  fs.writeFileSync(keyPath, forge.pki.privateKeyToPem(keys.privateKey));
+}
+
+const options = {
+  key: fs.readFileSync(keyPath),
+  cert: fs.readFileSync(certPath),
+};
+
+// app.listen(env.PORT, () => console.log(`Server running on port ${env.PORT}`));
+
+const server = https.createServer(options, app);
+
+server.listen(env.PORT, () => {
+  console.log(`Secure server running on https://localhost:${env.PORT}`);
 });
-app.use(express.urlencoded({extended: true}));
-
-// Routes
-app.get("/", (req: Request, res: Response) => {
-    res.send("Hello World!");
-});
-
-app.use("/api/users", userAPIRoutes);
-
-// Handle internal server errors and return cleaned up response to users
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(" ❌ Uncaught error: ", err);
-    res.status(500).json({
-        error: "Something went wrong. Please try again later.",
-        details: env.NODE_ENV === "dev" ? err.message : undefined,
-    });
-});
-
-app.listen(env.PORT, () => console.log(`Server running on port ${env.PORT}`));
