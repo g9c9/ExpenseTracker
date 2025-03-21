@@ -5,4 +5,5 @@ export interface User {
   name: string;
   totalBalance: number;
   transactionCount: number;
+  bankBalances: Record<string, number>;
 }
