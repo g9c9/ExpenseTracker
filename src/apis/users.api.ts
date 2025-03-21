@@ -30,6 +30,7 @@ router.post(
         name: name,
         totalBalance: 0,
         transactionCount: 0,
+        bankBalances: {}
       };
 
       await addUser(newUser);

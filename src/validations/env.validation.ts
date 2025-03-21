@@ -16,6 +16,7 @@ const envSchema = z.object({
     .regex(/[a-z]/, 'JWT_SECRET must contain at least one lowercase letter')
     .regex(/\d/, 'JWT_SECRET must contain at least one number'),
   USERS_TABLE: z.coerce.string(),
+  TRANSACTIONS_TABLE: z.coerce.string(),
   CERTS_DIR: z.string().startsWith('./'),
 });
 

@@ -1,4 +1,5 @@
 import {
+  BatchWriteCommand,
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
@@ -7,6 +8,7 @@ import {
 import env from '../validations/env.validation';
 import { User } from '../interfaces/user.interface';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { Transaction } from '@/interfaces/transaction.interface';
 
 const client = new DynamoDBClient({ region: env.REGION });
 const dynamoDB = DynamoDBDocumentClient.from(client);
@@ -30,7 +32,7 @@ export const getUser = async (id: string): Promise<User | null> => {
       },
     }),
   );
-  return (result.Item?.[0] as User) || null;
+  return (result.Item as User) || null;
 };
 
 export const getUserEmail = async (email: string): Promise<User | null> => {
@@ -46,4 +48,17 @@ export const getUserEmail = async (email: string): Promise<User | null> => {
   );
 
   return (result.Items?.[0] as User) || null;
+};
+
+export const addTransactions = async (transactions: Transaction[]) => {
+  const putRequests = transactions.map((transaction) => ({
+    PutRequest: { Item: transaction },
+  }));
+  await dynamoDB.send(
+    new BatchWriteCommand({
+      RequestItems: {
+        [env.TRANSACTIONS_TABLE]: putRequests,
+      },
+    }),
+  );
 };
